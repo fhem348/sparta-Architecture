@@ -83,3 +83,5 @@ router.delete("/sign-out", authMiddleWare, async (req, res, next) => {
       next(err);
     }
   });
+
+  export default router;

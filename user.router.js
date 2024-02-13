@@ -54,34 +54,28 @@ router.post("/sign-up", async (req, res, next) => {
 });
 
 router.delete("/sign-out", authMiddleWare, async (req, res, next) => {
-    try {
-      const { email, password } = req.body;
-  
-      const user = await prisma.users.findFirst({
-        where: { email },
-      });
-  
-      if (!user) {
-        return res
-          .status(409)
-          .json({ errorMessage: "계정이 존재하지 않습니다." });
-      }
-  
-      const isPasswordMatch = await bcrypt.compare(password, user.password);
-  
-      if (!isPasswordMatch) {
-        return res
-          .status(401)
-          .json({ errorMessage: "비밀번호가 일치하지 않습니다." });
-      }
-      await prisma.users.delete({
-        where: { email },
-      });
-  
-      return res.status(200).json({ message: "회원 탈퇴가 완료되었습니다." });
-    } catch (err) {
-      next(err);
-    }
-  });
+  try {
+    const { password } = req.body;
 
-  export default router;
+    const user = req.user;
+
+    const isPasswordMatch = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordMatch) {
+      return res
+        .status(401)
+        .json({ errorMessage: "비밀번호가 일치하지 않습니다." });
+    }
+
+    await prisma.users.delete({
+      where: { email: user.email },
+    });
+
+    return res.status(200).json({ message: "회원 탈퇴가 완료되었습니다." });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ errorMessage: "서버 에러가 발생했습니다." });
+  }
+});
+
+export default router;

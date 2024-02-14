@@ -1,0 +1,51 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "mysql"
+    url      = env("DATABASE_URL")
+}
+
+model User {
+  userId    Int       @id @default(autoincrement())
+  email     String?   @unique
+  password  String?   @db.VarChar(255)
+  name      String?   @db.VarChar(255)
+  age       Int?   
+  gender    Gender?   
+  image     String?   @db.VarChar(255)
+  posts     Post[]    // 반대 방향의 관계 필드 추가
+}
+enum Gender {
+    MALE
+    FEMALE
+    male
+    female
+}
+
+// Post 모델
+model Post {
+  postId      Int       @id @default(autoincrement())
+  userId      Int
+  title       String?   @db.VarChar(255)
+  image       String?   @db.VarChar(255)
+  content     String?   @db.VarChar(255)
+  like        Int       @default(0)
+  updatedAt   DateTime  @updatedAt
+  createdAt   DateTime  @default(now())
+  user        User      @relation(fields: [userId], references: [userId])  // 반대 방향의 관계 필드 추가
+  comments    Comment[] // 반대 방향의 관계 필드 추가
+}
+
+model Comment {
+  commentId   Int       @id @default(autoincrement())
+  postId      Int
+  userId      Int
+  name        String?   @db.VarChar(255)
+  CC          String?   @db.VarChar(255)
+  CL          String?   @db.VarChar(255)
+  CUA         DateTime  @updatedAt
+  CCA         DateTime  @default(now())
+  post        Post      @relation(fields: [postId], references: [postId])  // 반대 방향의 관계 필드 추가
+}

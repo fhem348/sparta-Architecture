@@ -148,7 +148,9 @@ router.patch('/me', jwtValidate, async (req, res, next) => {
             },
         })
 
-        return res.status(200).json({ success: true, data: updatedUser })
+        return res
+            .status(200)
+            .json({ success: true, message: '수정완료하였습니다' })
     } catch (error) {
         next(err)
         // console.error('내 정보 수정 중 에러 발생:', error)

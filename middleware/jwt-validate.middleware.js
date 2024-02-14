@@ -8,7 +8,7 @@ const prisma = new PrismaClient()
 
 const jwtValidate = async (req, res, next) => {
     try {
-        console.log(req.cookies)
+        // console.log(req.cookies)
         const authorization = req.cookies.authorization
 
         if (!authorization) {

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Signup Page</title>
+        <script>
+            async function signupUser() {
+                const email = document.getElementById('email').value
+                const password = document.getElementById('password').value
+                const confirmPassword =
+                    document.getElementById('confirm-password').value
+                const name = document.getElementById('name').value
+                const age = document.getElementById('age').value
+                const gender = document.getElementById('gender').value
+                const image = document.getElementById('image').value
+
+                // 비밀번호 확인
+                if (password !== confirmPassword) {
+                    alert('비밀번호가 일치하지 않습니다.')
+                    return
+                }
+
+                try {
+                    const response = await fetch(
+                        'http://localhost:3001/users/sign-up',
+                        {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                email,
+                                password,
+                                name,
+                                age,
+                                gender,
+                                image,
+                            }),
+                        }
+                    )
+
+                    const data = await response.json()
+                    if (response.ok) {
+                        alert('가입되었습니다!')
+                    } else {
+                        alert('가입에 실패했습니다. 다시 시도해주세요.')
+                    }
+                    console.log(data) // 응답 데이터 출력 또는 처리
+                } catch (error) {
+                    console.error('회원가입 에러:', error)
+                }
+            }
+        </script>
+    </head>
+    <body>
+        <div class="container">
+            <h2>Signup Page</h2>
+            <form onsubmit="event.preventDefault(); signupUser()">
+                <input
+                    type="email"
+                    id="email"
+                    placeholder="Email"
+                    required
+                /><br />
+                <input
+                    type="password"
+                    id="password"
+                    placeholder="Password"
+                    required
+                /><br />
+                <input
+                    type="password"
+                    id="confirm-password"
+                    placeholder="Confirm Password"
+                    required
+                /><br />
+                <input
+                    type="text"
+                    id="name"
+                    placeholder="Name"
+                    required
+                /><br />
+                <input
+                    type="number"
+                    id="age"
+                    placeholder="Age"
+                    required
+                /><br />
+                <select id="gender" required>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option></select
+                ><br />
+                <input type="file" id="image" accept="image/*" required />
+                <button type="submit">Sign Up</button><br />
+            </form>
+        </div>
+    </body>
+</html>

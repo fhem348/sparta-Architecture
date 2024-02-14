@@ -14,7 +14,7 @@ app.use(cors())
 app.use(bodyParser.json())
 
 app.use('/users', userRouter)
-app.use('/post', postRouter)
+app.use('/posts', postRouter)
 
 app.listen(port, () => {
     console.log(`서버가 포트 ${port}에 연결되었습니다.`)

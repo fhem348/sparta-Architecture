@@ -5,6 +5,9 @@ const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient()
 const jwtValidate = require('../middleware/jwt-validate.middleware')
 const authenticateToken = require('../middleware/authenticate.middleware')
+const dotenv = require('dotenv')
+
+dotenv.config();
 
 const router = express.Router()
 
@@ -55,7 +58,7 @@ router.post('/sign-up', async (req, res) => {
             process.env.ACCESS_TOKEN_SECRET,
             { expiresIn: '1d' }
         )
-
+        res.cookie('authorization', `Bearer ${token}`);//포스트 테스트용입니다.
         return res.status(201).json({
             success: true,
             message: '회원가입이 성공적으로 완료되었습니다.',
@@ -106,7 +109,7 @@ router.post('/sign-in', async (req, res) => {
             process.env.ACCESS_TOKEN_SECRET,
             { expiresIn: '12h' }
         )
-
+        res.cookie('authorization', `Bearer ${accessToken}`);//포스트 테스트용입니다 삭제 하세요
         return res.json({ success: true, accessToken })
     } catch (error) {
         console.error('로그인 중 에러 발생:', error)

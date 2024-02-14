@@ -51,8 +51,6 @@ model Comment {
   CL          String?   @db.VarChar(255)
   CUA         DateTime  @updatedAt
   CCA         DateTime  @default(now())
- 
-  user        User      @relation(fields: [userId], references: [userId], onDelete: Cascade)  // 반대 방향의 관계 필드 추가
-  post        Post      @relation(fields: [postId], references: [postId], onDelete: Cascade)  // 반대 방향의 관계 필드 추가
+  post        Post      @relation(fields: [postId], references: [postId])  // 반대 방향의 관계 필드 추가
 }
 

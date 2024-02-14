@@ -4,6 +4,7 @@ const dotenv = require('dotenv')
 const cors = require('cors')
 const userRouter = require('./routers/user.router')
 const postRouter = require('./routers/post.router')
+const commentRouter = require('./routers/comment.router')
 const cookieParser = require('cookie-parser')
 
 dotenv.config()
@@ -16,7 +17,8 @@ app.use(bodyParser.json())
 app.use(cookieParser())
 
 app.use('/users', userRouter)
-app.use('/post', postRouter)
+app.use('/posts', postRouter)
+app.use('/comments', commentRouter)
 
 app.listen(port, () => {
     console.log(`서버가 포트 ${port}에 연결되었습니다.`)

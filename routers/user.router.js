@@ -69,8 +69,33 @@ router.post('/sign-up', async (req, res) => {
     }
 })
 
+// 회원가입 탈퇴
+router.delete('/sign-out', jwtValidate, async (req, res, next) => {
+    try {
+        const { password } = req.body
+
+        const user = res.locals.user
+
+        const isPasswordMatch = await bcrypt.compare(password, user.password)
+
+        if (!isPasswordMatch) {
+            return res
+                .status(401)
+                .json({ errorMessage: '비밀번호가 일치하지 않습니다.' })
+        }
+
+        await prisma.user.delete({
+            where: { email: user.email },
+        })
+
+        return res.status(200).json({ message: '회원 탈퇴가 완료되었습니다.' })
+    } catch (err) {
+        next(err)
+    }
+})
+
 // 로그인 라우터
-router.post('/sign-in', async (req, res) => {
+router.post('/sign-in', async (req, res, next) => {
     const { email, password } = req.body
 
     try {
@@ -106,13 +131,11 @@ router.post('/sign-in', async (req, res) => {
             process.env.ACCESS_TOKEN_SECRET,
             { expiresIn: '12h' }
         )
-
-        return res.json({ success: true, accessToken })
+        res.cookie('authorization', `Bearer ${accessToken}`)
+        // return res.json({ success: true, accessToken })
+        return res.status(200).json({ message: '로그인에 성공하였습니다.' })
     } catch (error) {
-        console.error('로그인 중 에러 발생:', error)
-        return res
-            .status(500)
-            .json({ success: false, message: '서버 에러가 발생했습니다.' })
+        next(err)
     }
 })
 

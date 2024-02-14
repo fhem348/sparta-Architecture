@@ -5,19 +5,21 @@ const prisma = new PrismaClient()
 
 const jwtValidate = async (req, res, next) => {
     try {
-        const authorization = req.headers.authorization
+        console.log(req.cookies)
+        const authorization = req.cookies.authorization
+
         if (!authorization) {
-            throw new Error('인증 정보가 올바르지 않습니다.')
+            throw new Error('인증 정보가 올바르지 않습니다1.')
         }
 
         const [tokenType, tokenValue] = authorization.split(' ')
         if (tokenType !== 'Bearer' || !tokenValue) {
-            throw new Error('인증 정보가 올바르지 않습니다.')
+            throw new Error('인증 정보가 올바르지 않습니다2.')
         }
 
         const token = jwt.verify(tokenValue, process.env.ACCESS_TOKEN_SECRET)
         if (!token.userId) {
-            throw new Error('인증 정보가 올바르지 않습니다.')
+            throw new Error('인증 정보가 올바르지 않습니다3.')
         }
 
         const user = await prisma.user.findUnique({
@@ -27,7 +29,7 @@ const jwtValidate = async (req, res, next) => {
         })
 
         if (!user) {
-            throw new Error('인증 정보가 올바르지 않습니다.')
+            throw new Error('인증 정보가 올바르지 않습니다4.')
         }
 
         res.locals.user = user

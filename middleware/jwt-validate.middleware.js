@@ -7,7 +7,7 @@ dotenv.config()
 const prisma = new PrismaClient()
 
 const jwtValidate = async (req, res, next) => {
-    //try {
+    try {
         const authorization = req.cookies.authorization
         if (!authorization) {
             throw new Error('인증 정보가 올바르지 않습니다.')
@@ -36,12 +36,12 @@ const jwtValidate = async (req, res, next) => {
         res.locals.user = user
 
         next()
-    // //} catch (err) {
-    //     return res.status(401).json({
-    //         success: false,
-    //         message: err.message,
-    //     })
-    // }
+    } catch (err) {
+        return res.status(401).json({
+            success: false,
+            message: err.message,
+        })
+    }
 }
 
 module.exports = jwtValidate

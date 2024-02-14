@@ -6,12 +6,12 @@ const authenticateToken = require('../middleware/authenticate.middleware')
 
 const router = express.Router();
 
-router.post('/', jwtValidate, async (req, res, next) => { //인증 및 인가 미들웨어 자리
+router.post('/', jwtValidate, async (req, res, next) => { // 포스트 생성
     const { title, image, content } = req.body;
     const { userId } = res.locals.user; //미들웨어에 따라 수정해야 될 부분
     await prisma.post.create({
       data: {
-        //userId,
+        userId,
         title,
         image,
         content
@@ -20,30 +20,28 @@ router.post('/', jwtValidate, async (req, res, next) => { //인증 및 인가 �
     return res.status(201).json({ success: true, message: "업로드가 완료되었습니다." });
 });
 
-router.get('/', async (req, res, next) => {
+router.get('/', async (req, res, next) => { //뉴스피드의 메인이라 볼수있는 거시기
   const posts = await prisma.post.findMany({
     select: {
       postId: true, 
-       username: {
+       user: {
          select: {name: true}
        },
       title: true, 
       image: true, 
-      content: true, 
-      include: {
-        _count: {
-          select: {
-            like: true 
-          }
-        }
-      },
+      content: true,
+      // include: { 
+      //   _count: {
+      //     select: { like: true, },
+      //   },
+      // },
       createdAt: true, 
     }
   });
   return res.status(200).json({ data: posts });
 });
 
-router.patch('/:postId', jwtValidate, async (req, res, next) => { //인증 및 인가 미들웨어 자리
+router.patch('/:postId', jwtValidate, async (req, res, next) => { //수정
   try{
   const postId = req.params.postId;
   const { title, content, image } = req.body;
@@ -87,8 +85,8 @@ router.patch('/:postId', jwtValidate, async (req, res, next) => { //인증 및 �
 }});
 
 
-router.delete('/:postId', jwtValidate, async (req, res, next) => { //인증 및 인가 미들웨어 자리
-  const { user } = res.locals.user;  //미들웨어에 따라 수정해야 될 부분
+router.delete('/:postId', jwtValidate, async (req, res, next) => { //삭제
+  const user = res.locals.user;  //미들웨어에 따라 수정해야 될 부분
   const postId = req.params.postId;
   if(!postId){
     return res.status(400).json({success: false, message: 'postId는 필수값입니다.'})
@@ -115,7 +113,7 @@ router.delete('/:postId', jwtValidate, async (req, res, next) => { //인증 및 
 });
 
 
-router.post('/:postId/like', jwtValidate,async (req, res, next) => { //인증 및 인가 미들웨어 자리
+router.post('/:postId/like', jwtValidate,async (req, res, next) => { //좋아요
   try{
   const postId = req.params.postId;
   const userId = res.locals.user;  //미들웨어에 따라 수정해야 될 부분
@@ -123,8 +121,9 @@ router.post('/:postId/like', jwtValidate,async (req, res, next) => { //인증 �
     where :{
       postId : Number(postId)
     }})
+    console.log(post.like);
 
-  await post.like.forEach(likedUser => {if(likedUser === userId){ //오류가능성 다분
+  await prisma.post.like.forEach(likedUser => {if(likedUser === userId){ //오류가능성 다분 이미 눌러져있을 경우를 구현
     prisma.post.like.delete({
       userId,
     });

@@ -1,7 +1,7 @@
 const express = require('express')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
-const { PrismaClient } = require('@prisma/client')
+const { PrismaClient, Prisma } = require('@prisma/client')
 const prisma = new PrismaClient()
 const jwtValidate = require('../middleware/jwt-validate.middleware')
 const authenticateToken = require('../middleware/authenticate.middleware')
@@ -9,7 +9,7 @@ const authenticateToken = require('../middleware/authenticate.middleware')
 const router = express.Router()
 
 // 회원가입 라우터
-router.post('/sign-up', async (req, res) => {
+router.post('/sign-up', async (req, res, next) => {
     const { email, password, name, age, gender, image } = req.body
 
     try {
@@ -38,34 +38,28 @@ router.post('/sign-up', async (req, res) => {
 
         const hashedPassword = await bcrypt.hash(password, 10) // 비밀번호 해싱
 
-        const newUser = await prisma.user.create({
-            data: {
-                email,
-                password: hashedPassword,
-                name,
-                age: parseInt(age),
-                gender,
-                image,
+        const [user] = await prisma.$transaction(
+            async (tx) => {
+                const user = await tx.user.create({
+                    data: {
+                        email,
+                        password: hashedPassword,
+                        name,
+                        age,
+                        gender,
+                        image,
+                    },
+                })
+                return [user]
             },
-        })
-
-        // JWT 토큰 생성
-        const token = jwt.sign(
-            { userId: newUser.userId },
-            process.env.ACCESS_TOKEN_SECRET,
-            { expiresIn: '1d' }
+            {
+                isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted,
+            }
         )
 
-        return res.status(201).json({
-            success: true,
-            message: '회원가입이 성공적으로 완료되었습니다.',
-            token,
-        })
-    } catch (error) {
-        console.error('회원가입 중 에러 발생:', error)
-        return res
-            .status(500)
-            .json({ success: false, message: '서버 에러가 발생했습니다.' })
+        return res.status(201).json({ message: '회원가입이 완료되었습니다' })
+    } catch (err) {
+        next(err)
     }
 })
 
@@ -140,18 +134,22 @@ router.post('/sign-in', async (req, res, next) => {
 })
 
 router.get('/me', jwtValidate, (req, res) => {
-    const user = res.locals.user
+    try {
+        const user = res.locals.user
 
-    return res.json({
-        email: user.email,
-        name: user.name,
-        age: user.age,
-        gender: user.gender,
-        image: user.image,
-    })
+        return res.json({
+            email: user.email,
+            name: user.name,
+            age: user.age,
+            gender: user.gender,
+            image: user.image,
+        })
+    } catch (err) {
+        next(err)
+    }
 })
 
-router.patch('/me', jwtValidate, async (req, res) => {
+router.patch('/me', jwtValidate, async (req, res, next) => {
     try {
         const user = res.locals.user
         const userId = user.userId
@@ -168,10 +166,11 @@ router.patch('/me', jwtValidate, async (req, res) => {
 
         return res.status(200).json({ success: true, data: updatedUser })
     } catch (error) {
-        console.error('내 정보 수정 중 에러 발생:', error)
-        return res
-            .status(500)
-            .json({ success: false, message: '서버 에러가 발생했습니다.' })
+        next(err)
+        // console.error('내 정보 수정 중 에러 발생:', error)
+        // return res
+        //     .status(500)
+        //     .json({ success: false, message: '서버 에러가 발생했습니다.' })
     }
 })
 

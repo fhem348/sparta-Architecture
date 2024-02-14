@@ -5,9 +5,6 @@ const { PrismaClient, Prisma } = require('@prisma/client')
 const prisma = new PrismaClient()
 const jwtValidate = require('../middleware/jwt-validate.middleware')
 const authenticateToken = require('../middleware/authenticate.middleware')
-const dotenv = require('dotenv')
-
-dotenv.config()
 
 const router = express.Router()
 
@@ -59,17 +56,35 @@ router.post('/sign-up', async (req, res, next) => {
                 isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted,
             }
         )
-        res.cookie('authorization', `Bearer ${token}`) //포스트 테스트용입니다.
-        return res.status(201).json({
-            success: true,
-            message: '회원가입이 성공적으로 완료되었습니다.',
-            token,
+
+        return res.status(201).json({ message: '회원가입이 완료되었습니다' })
+    } catch (err) {
+        next(err)
+    }
+})
+
+// 회원가입 탈퇴
+router.delete('/me', jwtValidate, async (req, res, next) => {
+    try {
+        const { password } = req.body
+
+        const user = res.locals.user
+
+        const isPasswordMatch = await bcrypt.compare(password, user.password)
+
+        if (!isPasswordMatch) {
+            return res
+                .status(401)
+                .json({ errorMessage: '비밀번호가 일치하지 않습니다.' })
+        }
+
+        await prisma.user.delete({
+            where: { email: user.email },
         })
-    } catch (error) {
-        console.error('회원가입 중 에러 발생:', error)
-        return res
-            .status(500)
-            .json({ success: false, message: '서버 에러가 발생했습니다.' })
+
+        return res.status(200).json({ message: '회원 탈퇴가 완료되었습니다.' })
+    } catch (err) {
+        next(err)
     }
 })
 
@@ -110,8 +125,9 @@ router.post('/sign-in', async (req, res, next) => {
             process.env.ACCESS_TOKEN_SECRET,
             { expiresIn: '12h' }
         )
-
-        return res.json({ success: true, accessToken })
+        res.cookie('authorization', `Bearer ${accessToken}`)
+        // return res.json({ success: true, accessToken })
+        return res.status(200).json({ message: '로그인에 성공하였습니다.' })
     } catch (error) {
         next(err)
     }

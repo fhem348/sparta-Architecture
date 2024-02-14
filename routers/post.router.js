@@ -42,13 +42,13 @@ router.get('/post', async (req, res, next) => {
             //   },
             // },
             createdAt: true,
-            comment: {
-                select: {
-                    commentId: true,
-                    CC: true,
-                    CCA: true,
-                },
-            },
+            // comment: {
+            //     select: {
+            //         commentId: true,
+            //         CC: true,
+            //         CCA: true,
+            //     },
+            // },
         },
     })
     return res.status(200).json({ data: posts })

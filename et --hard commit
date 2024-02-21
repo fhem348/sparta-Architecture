@@ -1,8 +1,0 @@
-[33mb492e8c[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m HEAD@{0}: reset: moving to HEAD
-[33mb492e8c[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m HEAD@{1}: checkout: moving from main to main
-[33mb492e8c[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m HEAD@{2}: Branch: renamed refs/heads/master to refs/heads/main
-[33mb492e8c[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m HEAD@{4}: commit (merge): Merge branch 'sign-in' of https://github.com/sparta-project/spa_newsfeed
-[33mcb18f49[m HEAD@{5}: reset: moving to HEAD
-[33mcb18f49[m HEAD@{6}: commit (merge): Merge branch 'qwer' of https://github.com/sparta-project/spa_newsfeed
-[33m2de7d45[m[33m ([m[1;31morigin/master[m[33m)[m HEAD@{7}: commit (merge): Merge branch 'sign-in' of https://github.com/sparta-project/spa_newsfeed
-[33maf2339c[m HEAD@{8}: commit (initial): merge

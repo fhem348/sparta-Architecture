@@ -16,7 +16,6 @@ const port = 3001
 app.use(cors())
 app.use(cookieParser())
 app.use(bodyParser.json())
-app.use(cookieParser())
 
 app.use('/users', userRouter)
 app.use('/posts', postRouter)

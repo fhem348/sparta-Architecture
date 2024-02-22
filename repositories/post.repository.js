@@ -1,54 +1,51 @@
 const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient()
 
-const createPost = async (userId, title, image, content) => {
-    return await prisma.post.create({
-        data: {
-            userId,
-            title,
-            image,
-            content,
-        },
-    })
-}
-
-const getPosts = async () => {
-    return await prisma.post.findMany({
-        select: {
-            postId: true,
-            user: {
-                select: { name: true },
+class PostRepository {
+    createPost = async (userId, title, image, content) => {
+        return await prisma.post.create({
+            data: {
+                userId,
+                title,
+                image,
+                content,
             },
-            title: true,
-            image: true,
-            content: true,
-            createdAt: true,
-        },
-    })
-}
+        })
+    }
 
-const updatePost = async (userId, postId, title, content, image) => {
-    return await prisma.post.update({
-        where: { postId },
-        data: { title, content, image },
-    })
-}
+    getPosts = async () => {
+        return await prisma.post.findMany({
+            select: {
+                postId: true,
+                user: {
+                    select: { name: true },
+                },
+                title: true,
+                image: true,
+                content: true,
+                createdAt: true,
+            },
+        })
+    }
 
-const deletePost = async (userId, postId) => {
-    return await prisma.post.deleteMany({ where: { userId, postId } })
-}
+    updatePost = async (userId, postId, title, content, image) => {
+        return await prisma.post.update({
+            where: { postId },
+            data: { title, content, image },
+        })
+    }
 
-const likePost = async (userId, postId) => {
-    return await prisma.post.update({
-        where: { postId },
-        data: { like: { push: userId } },
-    })
-}
+    deletePost = async (userId, postId) => {
+        return await prisma.post.deleteMany({ where: { userId, postId } })
+    }
 
-module.exports = {
-    createPost,
-    getPosts,
-    updatePost,
-    deletePost,
-    likePost,
+    likePost = async (userId, postId) => {
+        return await prisma.post.update({
+            where: { postId },
+            data: { like: { push: userId } },
+        })
+    }
 }
+const postRepository = new PostRepository()
+
+module.exports = postRepository

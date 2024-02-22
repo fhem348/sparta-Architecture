@@ -1,35 +1,33 @@
 const postRepository = require('../repositories/post.repository.js')
 
-const createPost = async (userId, title, image, content) => {
-    return await postRepository.createPost(userId, title, image, content)
+class PostService {
+    createPost = async (userId, title, image, content) => {
+        return await postRepository.createPost(userId, title, image, content)
+    }
+
+    getPosts = async () => {
+        return await postRepository.getPosts()
+    }
+
+    updatePost = async (userId, postId, title, content, image) => {
+        return await postRepository.updatePost(
+            userId,
+            postId,
+            title,
+            content,
+            image
+        )
+    }
+
+    deletePost = async (userId, postId) => {
+        return await postRepository.deletePost(userId, postId)
+    }
+
+    likePost = async (userId, postId) => {
+        return await postRepository.likePost(userId, postId)
+    }
 }
 
-const getPosts = async () => {
-    return await postRepository.getPosts()
-}
+const postservice = new PostService()
 
-const updatePost = async (userId, postId, title, content, image) => {
-    return await postRepository.updatePost(
-        userId,
-        postId,
-        title,
-        content,
-        image
-    )
-}
-
-const deletePost = async (userId, postId) => {
-    return await postRepository.deletePost(userId, postId)
-}
-
-const likePost = async (userId, postId) => {
-    return await postRepository.likePost(userId, postId)
-}
-
-module.exports = {
-    createPost,
-    getPosts,
-    updatePost,
-    deletePost,
-    likePost,
-}
+module.exports = postservice
